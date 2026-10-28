@@ -1,0 +1,9 @@
+build/
+results/*
+!results/.gitkeep
+*.vtk
+*.vtu
+.vscode/
+.idea/
+.cache/
+compile_commands.json
