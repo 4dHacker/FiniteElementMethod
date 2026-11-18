@@ -1,7 +1,7 @@
 #include <cmath>
 #include <iostream>
 
-#include "fem/assembly.hh"
+#include "fem/fem.hh"
 
 // Unit square, 4 triangles around the center point (index 4, the only interior point).
 // Exact solution u = x(1-x) + y(1-y) has -Laplace(u) = 4; g = u on the boundary.
@@ -18,8 +18,7 @@ int main() {
   m.on_boundary = {true, true, true, true, false};
 
   auto sys = fem::assemble_poisson(m, Exact{});
-  auto LU = hdnum::sparseLUDecomposition(sys.A);
-  auto u = hdnum::sparseLUSolver(LU, sys.b);
+  auto u = fem::solve(sys);
 
   // Hand computation: K_cc = 4, corner values g = 0, load = 4 * (1/3 total area) -> u_c = 1/3
   const double err = std::abs(u[4] - 1.0 / 3.0);

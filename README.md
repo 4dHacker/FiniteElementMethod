@@ -4,6 +4,9 @@
 
 Pipeline: `Gmsh .geo → .msh → Mesh{points, triangles} → assemble sparse matrix (HDNUM) → solve → .vtk → ParaView`
 
+The FEM assembly is still a placeholder. The program and assembly test will not
+produce a valid solution until the assembly and boundary conditions are implemented.
+
 ## Setup
 
 ```bash
@@ -27,8 +30,7 @@ paraview results/solution.vtk
 |---|---|
 | `include/fem/mesh.hh` | `Mesh`: `points` (N×2), `triangles` (M×3, 0-based), `on_boundary` |
 | `include/fem/mesh_reader.hh` | Gmsh msh2 → `Mesh` |
-| `include/fem/problem.hh` | PDE data (`f`, `g`); edit for your equation |
-| `include/fem/assembly.hh` | local → global assembly into HDNUM `SparseMatrix`, Dirichlet BCs |
+| `include/fem/fem.hh` | FEM implementation: PDE data, assembly placeholder and HDNUM solve |
 | `include/fem/vtk_writer.hh` | solution → legacy VTK |
 | `src/main.cc` | driver |
 | `tests/` | small checks with known answers |

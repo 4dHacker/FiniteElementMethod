@@ -4,7 +4,8 @@ Overview of how `fem2d` works, from the user's input to the visualization (as of
 
 ## 0. Starting point
 
-*Currently only $f$ and Dirichlet ($g$) are supported, the rest is planned.*
+*Assembly and boundary conditions are still to be implemented. The initial model
+problem specifies $f$ and Dirichlet data $g$; the rest is planned.*
 
 The user has
 
@@ -120,7 +121,7 @@ fem::Mesh mesh = fem::read_gmsh_msh2(argv[1]);
 
 ## 3. Assembly: building the large linear system $Au = b$ (still to be implemented)
 
-- File: `include/fem/assembly.hh`, function `assemble_poisson` (still empty)
+- File: `include/fem/fem.hh`, function `assemble_poisson` (still empty)
 - Approach: `assemble_poisson` gets the `Mesh` and the user functions (`Problem`) and returns a `LinearSystem`, i.e. the matrix `A` as `hdnum::SparseMatrix` and the vector `b`
 
 How it works:
@@ -159,11 +160,12 @@ How it works:
 
 ## 4. Solving $Au = b$
 
-Already implemented in `src/main.cc`:
+The HDNUM calls are in `solve` in `include/fem/fem.hh`. They can only produce a
+valid solution once assembly has been implemented:
 
 ```cpp
-auto LU = hdnum::sparseLUDecomposition(sys.A);
-hdnum::Vector<double> u = hdnum::sparseLUSolver(LU, sys.b);
+auto LU = hdnum::sparseLUDecomposition(system.A);
+return hdnum::sparseLUSolver(LU, system.b);
 ```
 
 How it works:
