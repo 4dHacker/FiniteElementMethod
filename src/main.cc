@@ -11,12 +11,31 @@ int main(int argc, char** argv) {
     return 1;
   }
   //reading mesh from file
-  const fem::Mesh mesh = fem::read_gmsh_msh2(argv[1]);
+  const fem::Mesh mesh = fem::read_gmsh_msh(argv[1]);
   const auto& points = mesh.points;
   const auto& triangles = mesh.triangles;
 
-  //right-hand side f(x, y) (example)
-  auto f = [](double x, double y) { return 2.0 * x * (1.0 - x) + 2.0 * y * (1.0 - y); };
+  //right-hand side f(x, y)
+
+  //sine-square example
+  /*
+  const double pi = std::acos(-1.0);
+  auto f = [pi](double x, double y) {
+    return 2.0 * pi * pi * std::sin(pi * x) * std::sin(pi * y);
+  };
+  */
+  
+  //disk-example
+  /*
+  auto f = [](double, double) { return 4.0; };
+  */
+
+  //l-example
+  const auto p = [](double t) { return t * (1.0 - t) * (t - 0.5); };
+  const auto p_second = [](double t) { return 3.0 - 6.0 * t; };
+  auto f = [p, p_second](double x, double y) {
+    return -(p_second(x) * p(y) + p(x) * p_second(y));
+  };
 
   std::cout << points.size() << " points, " << triangles.size() << " triangles\n";
 
@@ -77,7 +96,7 @@ int main(int argc, char** argv) {
   z = hdnum::sparseLUSolver(LU, B);
 
   //writing solution for ParaView
-  const std::string output = argc > 2 ? argv[2] : "results/solution.vtk";
+  const std::string output = argc > 2 ? argv[2] : "results/squaresolution.vtk";
   fem::write_vtk(output, mesh, z);
   std::cout << "Solution written to " << output << "\n";
 }

@@ -4,8 +4,9 @@
 
 Pipeline: `Gmsh .geo → .msh → Mesh{points, triangles} → assemble sparse matrix (HDNUM) → solve → .vtk → ParaView`
 
-The FEM assembly is still a placeholder. The program and assembly test will not
-produce a valid solution until the assembly and boundary conditions are implemented.
+The driver assembles and solves the Poisson problem with P1 triangles and
+homogeneous Dirichlet boundary conditions. The right-hand side is selected in
+`src/main.cc`; see the example problems for matching functions and meshes.
 
 ## Setup
 
@@ -19,20 +20,23 @@ ctest --test-dir build --output-on-failure
 ## Run
 
 ```bash
-gmsh -2 -format msh2 meshes/square.geo -o meshes/square.msh   # ASCII format 2 is required
+gmsh -2 meshes/square.geo -o meshes/square.msh
 ./build/fem2d meshes/square.msh results/solution.vtk
 paraview results/solution.vtk
 ```
+
+The mesh reader accepts ASCII Gmsh MSH 2.x and 4.x files.
+See [example problems](docs/example-problems.md) for meshes and matching
+right-hand-side lambdas.
 
 ## Layout
 
 | Path | Purpose |
 |---|---|
 | `include/fem/mesh.hh` | `Mesh`: `points` (N×2), `triangles` (M×3, 0-based), `on_boundary` |
-| `include/fem/mesh_reader.hh` | Gmsh msh2 → `Mesh` |
-| `include/fem/fem.hh` | FEM implementation: PDE data, assembly placeholder and HDNUM solve |
+| `include/fem/mesh_reader.hh` | Gmsh MSH 2.x/4.x → `Mesh` |
 | `include/fem/vtk_writer.hh` | solution → legacy VTK |
-| `src/main.cc` | driver |
+| `src/main.cc` | driver, FEM assembly, boundary conditions and solve |
 | `tests/` | small checks with known answers |
 | `meshes/` | `.geo` sources (commit) and small `.msh` files |
 | `docs/` | math derivation |
