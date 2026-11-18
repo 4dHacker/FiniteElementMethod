@@ -1,6 +1,8 @@
+#include <cmath>
 #include <iostream>
 
 #include "fem/mesh_reader.hh"
+#include "fem/vtk_writer.hh"
 #include "hdnum.hh"
 
 int main(int argc, char** argv) {
@@ -33,7 +35,7 @@ int main(int argc, char** argv) {
     const auto& [x2, y2] = points[i2];
     
     //area of the triangle
-    double area = 0.5 * ((x1 - x0) * (y2 - y0) - (x2 - x0) * (y1 - y0));
+    double area = 0.5 * std::abs((x1 - x0) * (y2 - y0) - (x2 - x0) * (y1 - y0));
     
     //Gradients of Hutfunction
     double beta[3] = {y1-y2, y2-y0, y0-y1};
@@ -42,7 +44,7 @@ int main(int argc, char** argv) {
     //local stiffness matrix for the triangle
     double A_loc[3][3];
     double c = f((x0 + x1 + x2) / 3.0, (y0 + y1 + y2) / 3.0)*area/3;
-    
+
     for (int i = 0; i < 3; i++) {
       auto a = T[i];
       B[a] += c;
@@ -53,5 +55,29 @@ int main(int argc, char** argv) {
       }
     }
   }
+
+  //Boundary conditions (Dirichlet)
+  const auto& on_boundary = mesh.on_boundary;
+
+  for (std::size_t i = 0; i < N; i++) {
+    if (on_boundary[i]) {
+      B[i] = 0.0;
+      for (auto& [j, value] : builder[i]) {
+        value = 0.0;
+        builder[j][i] = 0.0;
+      }
+      builder[i][i] = 1.0;
+    }
+  }
   auto A = builder.build();
+  
+  //done with AI
+  //solving A z = B via sparse LU decomposition
+  auto LU = hdnum::sparseLUDecomposition(A);
+  z = hdnum::sparseLUSolver(LU, B);
+
+  //writing solution for ParaView
+  const std::string output = argc > 2 ? argv[2] : "results/solution.vtk";
+  fem::write_vtk(output, mesh, z);
+  std::cout << "Solution written to " << output << "\n";
 }
