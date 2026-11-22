@@ -18,5 +18,12 @@ target_compile_options(fem INTERFACE -Wall -Wextra)
 add_executable(fem2d src/main.cc)
 target_link_libraries(fem2d PRIVATE fem)
 
+# Independent reader demo, usable before assembly is implemented.
+add_executable(read_mesh src/read_mesh.cc)
+target_link_libraries(read_mesh PRIVATE fem)
+
+add_executable(element_demo src/element_demo.cc)
+target_link_libraries(element_demo PRIVATE fem)
+
 enable_testing()
 add_subdirectory(tests)

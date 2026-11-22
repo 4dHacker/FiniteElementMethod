@@ -4,6 +4,25 @@
 
 Pipeline: `Gmsh .geo → .msh → Mesh{points, triangles} → assemble sparse matrix (HDNUM) → solve → .vtk → ParaView`
 
+## AI branch: reader milestone
+
+This branch stops at the 2D mesh reader; assembly is still a placeholder.
+See [AI reader scope, provenance and validation](docs/ai-gmsh-reader.md).
+On the configured Windows machine, run `./scripts/build-reader.ps1` in PowerShell.
+With a configured CMake build, use `cmake --build build --target read_mesh test_mesh_reader`,
+then `ctest --test-dir build -R '^mesh_reader$' --output-on-failure` and
+`./build/read_mesh meshes/square.msh` (Windows: `read_mesh.exe`).
+
+## AI local-element milestone
+
+Local P1 Poisson element calculations are available independently of assembly.
+See [the hand-verification worksheet](docs/element-hand-check.md) and the separate
+[reference answers](docs/element-reference-results.md).
+On the configured Windows machine, run `./scripts/build-element.ps1` in PowerShell.
+After doing the hand calculation, run `./build/element_demo.exe reference` or
+`./build/element_demo.exe skew` with the MinGW runtime on PATH.
+The full assembly/solver remains unfinished.
+
 ## Setup
 
 ```bash
@@ -41,3 +60,14 @@ paraview results/solution.vtk
 - Work on feature branches, merge via pull requests; keep `main` building.
 - Commit `.geo` files, not large generated meshes or results.
 - Agree on interface changes (`Mesh`, `assemble_*` signatures) before changing them.
+## Comparing the implementations
+
+The AI track on this branch and the team implementation on main started at
+ba6f294. Compare each branch against that common commit for attribution.
+On 2026-11-22 the team snapshot was 5007728. Its commit messages identify AI
+assistance on some tasks. Record assistance per task when reporting the comparison.
+
+Verified on Windows: 39 reader checks and 221 element checks passed. The shared
+square mesh yielded 142 points, 242 triangles and 40 boundary points. The AI
+milestone covers the ASCII MSH 2.2 reader and local P1 elements. Global assembly
+is still a placeholder on this branch. Human hand verification is pending.
