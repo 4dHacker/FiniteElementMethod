@@ -8,6 +8,12 @@ The driver assembles and solves the Poisson problem with P1 triangles and
 homogeneous Dirichlet boundary conditions. The right-hand side is selected in
 `src/main.cc`; see the example problems for matching functions and meshes.
 
+## Documentation
+
+A step-by-step explanation of the method and the code, from the weak form to
+`src/main.cc`: [German](docs/documentation_de.md) ([PDF](docs/documentation_de.pdf)),
+[English](docs/documentation_en.md) ([PDF](docs/documentation_en.pdf)).
+
 ## Setup
 
 ```bash
@@ -39,7 +45,7 @@ right-hand-side lambdas.
 | `src/main.cc` | driver, FEM assembly, boundary conditions and solve |
 | `tests/` | small checks with known answers |
 | `meshes/` | `.geo` sources (commit) and small `.msh` files |
-| `docs/` | math derivation |
+| `docs/` | documentation (German/English, Markdown and PDF), pipeline overview, example problems |
 | `external/hdnum` | HDNUM git submodule |
 
 ## Team conventions
